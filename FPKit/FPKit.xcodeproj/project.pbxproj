@@ -12,6 +12,8 @@
 		3D63E2801C50445C005C67AB /* FPKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D63E27F1C50445C005C67AB /* FPKitTests.swift */; };
 		3D63E2FA1C504A8E005C67AB /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D63E2F91C504A8E005C67AB /* Quick.framework */; };
 		3D63E2FC1C504A93005C67AB /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D63E2FB1C504A93005C67AB /* Nimble.framework */; };
+		3D8B9E131C51A16F002B092E /* FPLazyImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */; };
+		3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,8 @@
 		3D63E2811C50445C005C67AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D63E2F91C504A8E005C67AB /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = "../Carthage/Checkouts/Quick/build/Debug-iphoneos/Quick.framework"; sourceTree = "<group>"; };
 		3D63E2FB1C504A93005C67AB /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = "../Carthage/Checkouts/Nimble/build/Debug-iphoneos/Nimble.framework"; sourceTree = "<group>"; };
+		3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageView.swift; sourceTree = "<group>"; };
+		3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +85,9 @@
 			children = (
 				3D63E2731C50445C005C67AB /* FPKit.h */,
 				3D63E2751C50445C005C67AB /* Info.plist */,
+				3D8B9E0F1C51A0FF002B092E /* Views */,
+				3D8B9E111C51A119002B092E /* Controllers */,
+				3D8B9E101C51A10B002B092E /* Utils */,
 			);
 			path = FPKit;
 			sourceTree = "<group>";
@@ -92,6 +99,29 @@
 				3D63E2811C50445C005C67AB /* Info.plist */,
 			);
 			path = FPKitTests;
+			sourceTree = "<group>";
+		};
+		3D8B9E0F1C51A0FF002B092E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */,
+				3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		3D8B9E101C51A10B002B092E /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
+		3D8B9E111C51A119002B092E /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,6 +232,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */,
+				3D8B9E131C51A16F002B092E /* FPLazyImageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,6 +348,7 @@
 		3D63E2851C50445C005C67AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -326,12 +359,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstperson.FPKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		3D63E2861C50445C005C67AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

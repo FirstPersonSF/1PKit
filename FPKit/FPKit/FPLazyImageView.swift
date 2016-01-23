@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public class FTGLazyImageView: UIImageView {
+public class FPLazyImageView: UIImageView {
     
 //MARK:- Private Properties
     
@@ -18,8 +18,8 @@ public class FTGLazyImageView: UIImageView {
 //MARK: Public Properties
     
     // read only
-    private(set) var downloading: Bool = false
-    private(set) var downloaded: Bool = false
+    public private(set) var downloading: Bool = false
+    public private(set) var downloaded: Bool = false
     
     // read & write
     public var imageURL: NSURL? {
@@ -42,7 +42,7 @@ public class FTGLazyImageView: UIImageView {
     }
     public var animatedTransition: Bool = true
     public var transitionDuration:CFTimeInterval = 0.25
-    public var completionHandler: (imageView: FTGLazyImageView, result: FTGLazyImageResult) -> Void = { _ in }
+    public var completionHandler: (imageView: FPLazyImageView, result: FPLazyImageResult) -> Void = { _ in }
     
 //MARK:- View Lifecycle
     
@@ -90,11 +90,11 @@ public class FTGLazyImageView: UIImageView {
                     self.image = image
                     self.downloaded = true
                     
-                    let result = FTGLazyImageResult.Success(data: data, response: response, error: error)
+                    let result = FPLazyImageResult.Success(data: data, response: response, error: error)
                     self.completionHandler(imageView: self, result: result)
                 })
             } else {
-                let result = FTGLazyImageResult.Failure(data: data, response: response, error: error)
+                let result = FPLazyImageResult.Failure(data: data, response: response, error: error)
                 self.completionHandler(imageView: self, result: result)
             }
         })

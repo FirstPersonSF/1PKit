@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public enum FTGLazyImageResult {
+public enum FPLazyImageResult {
     
     case Success(data: NSData?, response: NSURLResponse?, error: NSError?)
     case Failure(data: NSData?, response: NSURLResponse?, error: NSError?)

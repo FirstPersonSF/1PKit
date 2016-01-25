@@ -360,6 +360,99 @@ class FPDataValidatorSpec: QuickSpec {
                 
             })
         })
+        
+//MARK:- String Validator - Matching RegEx
+        describe("A String Validator -  Matching RegEx", closure: {
+            
+            let isRegex = FPStringValidations.evaluatesWithRegex(regex: "[A-Za-z]*", errorMessage: "Only alphabets are allowed")
+            var validations: [FPStringValidations] = []
+            
+            context("when checking for valid String conforming to regex", closure: {
+                
+                beforeEach({
+                    validations  = [isRegex]
+                })
+                
+                it("is valid", closure: {
+                    let string = "ABCabcXYZxyz"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beTrue())
+                })
+                
+                it("is invalid - does not conform to regEx", closure: {
+                    let string = "Hello123!"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beFalse())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
+                })
+                
+                
+            })
+        })
+        
+//MARK:- String Validator - UpperCase characters Range
+        describe("A String Validator -  UpperCase characters Range", closure: {
+            
+            let isUpperCaseRange = FPStringValidations.containsUpperCaseCharactersRange(lessThan: 5, greaterThan: 0, errorMessage: "The number of upper case characters should be greater than 0 and less than 5")
+            var validations: [FPStringValidations] = []
+            
+            context("when checking for valid String -  UpperCase characters Range", closure: {
+                
+                beforeEach({
+                    validations  = [isUpperCaseRange]
+                })
+                
+                it("is valid", closure: {
+                    let string = "ABCDefgh"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beTrue())
+                })
+                
+                it("is invalid - less than Min", closure: {
+                    let string = "hello!"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beFalse())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
+                })
+                
+                it("is invalid - More Than Max", closure: {
+                    let string = "HELLO THERE"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beFalse())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
+                })
+                
+            })
+        })
+        
+//MARK:- String Validator - UpperCase characters Length
+        describe("A String Validator -  UpperCase characters Range", closure: {
+            
+            let isUpperCaseLength = FPStringValidations.containsUpperCaseCharactersLength(equalTo: 2, errorMessage: "The number of uppercase characters should be equal to 2")
+            var validations: [FPStringValidations] = []
+            
+            context("when checking for valid String -  UpperCase characters Length", closure: {
+                
+                beforeEach({
+                    validations  = [isUpperCaseLength]
+                })
+                
+                it("is valid", closure: {
+                    let string = "ABcd2345"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beTrue())
+                })
+                
+                it("is invalid", closure: {
+                    let string = "hello!"
+                    let valueReturned = FPDataValidator.validateString(string, validations: validations)
+                    expect(valueReturned.isValid).to(beFalse())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
+                })
+            })
+        })
+
+
 
 
     }

@@ -22,5 +22,8 @@ public enum FPStringValidations {
     case containsSpecialCharactersLength(equalTo: Int, errorMessage:String)
     case containsNumbersRange(lessThan: Int, greaterThan: Int, errorMessage: String)
     case containsNumbersLength(equalTo: Int, errorMessage: String)
+    case evaluatesWithRegex(regex: String, errorMessage: String)
+    case containsUpperCaseCharactersRange(lessThan: Int, greaterThan: Int, errorMessage: String)
+    case containsUpperCaseCharactersLength(equalTo: Int,errorMessage: String)
     
 }

@@ -84,7 +84,23 @@ public class FPDataValidator {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
+            case let .evaluatesWithRegex(regex, errorMessage):
+                if !FPDataValidator.evaluatesWithRegex(string, regex: regex) {
+                    isValid = false
+                    errorMessages.append(errorMessage)
+                }
                 
+            case let .containsUpperCaseCharactersRange(lessThanNum, greaterThanNum, errorMessage):
+                if !FPDataValidator.containsUpperCaseCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum) {
+                    isValid = false
+                    errorMessages.append(errorMessage)
+                }
+                
+            case let .containsUpperCaseCharactersLength(equalToNum, errorMessage):
+                if !FPDataValidator.containsUpperCaseCharactersLength(string, equalTo: equalToNum) {
+                    isValid = false
+                    errorMessages.append(errorMessage)
+                }
             }
         }
         
@@ -230,6 +246,56 @@ public class FPDataValidator {
         return count == equalTo
     }
     
+    class private func evaluatesWithRegex(string: String,regex: String) -> Bool {
+        
+        let test = NSPredicate(format: "SELF MATCHES %@", regex)
+        return test.evaluateWithObject(string)
+    
+    }
+    
+    class private func containsUpperCaseCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
+        
+        var passed = true
+        let upperCaseRegex = "[A-Z]$"
+        var count = 0
+        for char in string.characters {
+            let c = String(char)
+            let test = NSPredicate(format: "SELF MATCHES %@", upperCaseRegex)
+            if test.evaluateWithObject(c) {
+                count++
+            }
+        }
+        if let lessThanNum = lessThan {
+            if count >= lessThanNum {
+                passed = false
+            }
+        }
+        if let greaterThanNum = greaterThan {
+            if count <= greaterThanNum {
+                passed = false
+            }
+        }
+        
+        return passed
+
+        
+    }
+    
+    class private func containsUpperCaseCharactersLength(string: String, equalTo:Int) -> Bool {
+        
+        let upperCaseRegex = "[A-Z]$"
+        var count = 0
+        for char in string.characters {
+            let c = String(char)
+            let test = NSPredicate(format: "SELF MATCHES %@", upperCaseRegex)
+            if test.evaluateWithObject(c) {
+                count++
+            }
+        }
+        
+        return count == equalTo
+        
+    }
 }
 
 

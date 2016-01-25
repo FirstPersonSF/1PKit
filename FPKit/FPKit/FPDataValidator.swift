@@ -15,7 +15,7 @@ public class FPDataValidator {
     
     
 //MARK:- Public Validation Methods
-    public func validateString(string: String,validations: [FPStringValidations]) -> (isValid: Bool, errorMessages: [String]?) {
+   class public func validateString(string: String,validations: [FPStringValidations]) -> (isValid: Bool, errorMessages: [String]?) {
         
         if(validations.count <= 0) {
             return (isValid: false, errorMessages: nil)
@@ -27,70 +27,70 @@ public class FPDataValidator {
         for var validation in validations {
             switch validation {
             case let .isEmail(errorMessage):
-                let emailPassed = self.isEmail(string)
+                let emailPassed = FPDataValidator.isEmail(string)
                 if emailPassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .isURL(errorMessage):
-                let urlPassed = self.isURL(string)
+                let urlPassed = FPDataValidator.isURL(string)
                 if urlPassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .isPhoneNumber(errorMessage):
-                let phoneNumberPassed = self.isPhoneNumber(string)
+                let phoneNumberPassed = FPDataValidator.isPhoneNumber(string)
                 if phoneNumberPassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .isFullName(errorMessage):
-                let fullNamePassed = self.isFullName(string)
+                let fullNamePassed = FPDataValidator.isFullName(string)
                 if fullNamePassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsCharactersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsCharactersRangePassed = self.containsCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
+                let containsCharactersRangePassed = FPDataValidator.containsCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
                 if containsCharactersRangePassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsCharactersLength(equalToNum, errorMessage):
-                let containsCharactersLengthPassed = self.containsCharactersLength(string, equalTo: equalToNum)
+                let containsCharactersLengthPassed = FPDataValidator.containsCharactersLength(string, equalTo: equalToNum)
                 if containsCharactersLengthPassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsSpecialCharactersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsSpecialCharactersRangePassed = self.containsSpecialCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
+                let containsSpecialCharactersRangePassed = FPDataValidator.containsSpecialCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
                 if containsSpecialCharactersRangePassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsSpecialCharactersLength(equalToNum, errorMessage):
-                let containsSpecialCharactersLength = self.containsSpecialCharactersLength(string, equalTo: equalToNum)
+                let containsSpecialCharactersLength = FPDataValidator.containsSpecialCharactersLength(string, equalTo: equalToNum)
                 if containsSpecialCharactersLength != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsNumbersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsNumbersRangePassed = self.containsNumbersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
+                let containsNumbersRangePassed = FPDataValidator.containsNumbersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
                 if containsNumbersRangePassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
                 break
             case let .containsNumbersLength(equalToNum, errorMessage):
-                let containsNumbersLengthPassed = self.containsNumbersLength(string, equalTo: equalToNum)
+                let containsNumbersLengthPassed = FPDataValidator.containsNumbersLength(string, equalTo: equalToNum)
                 if containsNumbersLengthPassed != true {
                     isValid = false
                     errorMessages.append(errorMessage)
@@ -105,19 +105,19 @@ public class FPDataValidator {
     
     
 //MARK:- Internal Methods - String Validations
-    private func isEmail(string: String) -> Bool{
-        let emailRegEx = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+    class private func isEmail(string: String) -> Bool{
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         return emailTest.evaluateWithObject(string)
     }
     
-    private func isURL(string: String) -> Bool{
+    class private func isURL(string: String) -> Bool{
         let urlRegEx = "(?i)https?://(?:www\\.)?\\S+(?:/|\\b)"
         let urlTest = NSPredicate(format: "SELF MATCHES %@", urlRegEx)
         return urlTest.evaluateWithObject(string)
     }
     
-    private func isPhoneNumber(string: String) -> Bool {
+    class private func isPhoneNumber(string: String) -> Bool {
         let phoneRegex1 = "^\\d{3}-\\d{3}-\\d{4}$"
         let phoneRegex2 = "^\\d{10}$"
         let phoneRegex3 = "^\\(\\d{3}\\)\\d{3}-\\d{4}$"
@@ -126,17 +126,19 @@ public class FPDataValidator {
         let phoneTest2 = NSPredicate(format: "SELF MATCHES %@", phoneRegex2)
         let phoneTest3 = NSPredicate(format: "SELF MATCHES %@", phoneRegex3)
         
-        return phoneTest1.evaluateWithObject(string) || phoneTest2.evaluateWithObject(string) || phoneTest3.evaluateWithObject(string)
+        let passed = phoneTest1.evaluateWithObject(string) || phoneTest2.evaluateWithObject(string) || phoneTest3.evaluateWithObject(string)
+        
+        return passed
         
     }
     
-    private func isFullName(string: String) -> Bool {
+    class private func isFullName(string: String) -> Bool {
         
         let nameArray: [String] = string.characters.split { $0 == " " }.map { String($0) }
         return nameArray.count >= 2
     }
     
-    private func containsCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
+    class private func containsCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
         
         var passed = true
         let length = string.characters.count
@@ -146,7 +148,7 @@ public class FPDataValidator {
             }
         }
         if let greaterThanNum = greaterThan {
-            if length < greaterThanNum {
+            if length <= greaterThanNum {
                 passed = false
             }
         }
@@ -154,12 +156,12 @@ public class FPDataValidator {
         return passed
     }
     
-    private func containsCharactersLength(string: String, equalTo: Int) -> Bool {
+    class private func containsCharactersLength(string: String, equalTo: Int) -> Bool {
         let length = string.characters.count
         return length == equalTo
     }
     
-    private func containsSpecialCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
+    class private func containsSpecialCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
         
         var passed = true
         let specialCharRegex = "[^A-Za-z0-9]"
@@ -178,7 +180,7 @@ public class FPDataValidator {
             }
         }
         if let greaterThanNum = greaterThan {
-            if count < greaterThanNum {
+            if count <= greaterThanNum {
                 passed = false
             }
         }
@@ -186,7 +188,7 @@ public class FPDataValidator {
         return passed
     }
     
-    private func containsSpecialCharactersLength(string: String, equalTo: Int) -> Bool {
+    class private func containsSpecialCharactersLength(string: String, equalTo: Int) -> Bool {
         let specialCharRegex = "[^A-Za-z0-9]"
         var count = 0
         for char in string.characters {
@@ -200,7 +202,7 @@ public class FPDataValidator {
         return count == equalTo
     }
     
-    private func containsNumbersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
+    class private func containsNumbersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
         
         
         var passed = true
@@ -219,7 +221,7 @@ public class FPDataValidator {
             }
         }
         if let greaterThanNum = greaterThan {
-            if count < greaterThanNum {
+            if count <= greaterThanNum {
                 passed = false
             }
         }
@@ -228,7 +230,7 @@ public class FPDataValidator {
 
     }
     
-    private func containsNumbersLength(string: String, equalTo: Int) -> Bool {
+    class private func containsNumbersLength(string: String, equalTo: Int) -> Bool {
         let numberRegex = "[0-9]$"
         var count = 0
         for char in string.characters {

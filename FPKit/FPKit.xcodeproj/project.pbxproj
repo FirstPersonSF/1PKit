@@ -16,6 +16,7 @@
 		3D8B9E171C51C549002B092E /* FPLazyImageViewSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */; };
 		677F345A1C51AADC00F57223 /* FPDataValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F34591C51AADC00F57223 /* FPDataValidator.swift */; };
 		677F345C1C51AAED00F57223 /* FPDataValidations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F345B1C51AAED00F57223 /* FPDataValidations.swift */; };
+		677F345E1C530E7E00F57223 /* FPDataValidatorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F345D1C530E7E00F57223 /* FPDataValidatorSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageViewSpec.swift; sourceTree = "<group>"; };
 		677F34591C51AADC00F57223 /* FPDataValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidator.swift; sourceTree = "<group>"; };
 		677F345B1C51AAED00F57223 /* FPDataValidations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidations.swift; sourceTree = "<group>"; };
+		677F345D1C530E7E00F57223 /* FPDataValidatorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidatorSpec.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 			children = (
 				3D63E2811C50445C005C67AB /* Info.plist */,
 				3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */,
+				677F345D1C530E7E00F57223 /* FPDataValidatorSpec.swift */,
 			);
 			path = FPKitTests;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D8B9E171C51C549002B092E /* FPLazyImageViewSpec.swift in Sources */,
+				677F345E1C530E7E00F57223 /* FPDataValidatorSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

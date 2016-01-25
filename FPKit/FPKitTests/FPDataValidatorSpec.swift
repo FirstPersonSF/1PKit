@@ -15,7 +15,7 @@ import FPKit
 class FPDataValidatorSpec: QuickSpec {
     
     override func spec() {
-//MARK- String Validator - Email
+//MARK:- String Validator - Email
         describe("A String Validator - Email ", closure: {
             
             let isEmailValidation = FPStringValidations.isEmail(errorMessage: "Email is not Valid")
@@ -33,59 +33,35 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            context("when checking for an invalid email - no '@' sign", closure: {
-                
-                beforeEach({
-                    validations  = [isEmailValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - no '@' sign", closure: {
                     let emailString = "abcd.firstperson.is"
                     let valueReturned = FPDataValidator.validateString(emailString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
-            })
-            
-            context("when checking for an invalid email - no domain", closure: {
-                
-                beforeEach({
-                    validations  = [isEmailValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - no domain", closure: {
                     let emailString = "abcd@firstpersonis"
                     let valueReturned = FPDataValidator.validateString(emailString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
-            })
-            
-            context("when checking for an invalid email - ends with a dot", closure: {
-                
-                beforeEach({
-                    validations  = [isEmailValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - ends with a dot", closure: {
                     let emailString = "abcd@firstpersonis."
                     let valueReturned = FPDataValidator.validateString(emailString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-
-
         })
         
         
         
         
-//MARK:- String Validator -
+//MARK:- String Validator - URL
         describe("A String Validator - URL ", closure: {
             
             let isURLValidation = FPStringValidations.isURL(errorMessage: "URL is not Valid")
@@ -103,39 +79,22 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for an invalid URL - no http", closure: {
-                
-                beforeEach({
-                    validations  = [isURLValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - no http", closure: {
                     let urlString = "://www.firstperson.is"
                     let valueReturned = FPDataValidator.validateString(urlString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
-            })
-            
-            context("when checking for an invalid URL - ending with .", closure: {
-                
-                beforeEach({
-                    validations  = [isURLValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - ending with .", closure: {
                     let urlString = "http://www.firstperson."
                     let valueReturned = FPDataValidator.validateString(urlString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-            
-            
             
         })
         
@@ -158,48 +117,17 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for a valid Phone Number - without parenthesis", closure: {
-                
-                beforeEach({
-                    validations  = [isPhoneNumberValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is valid - without parenthesis", closure: {
                     let phoneNumberString = "404-333-1111"
                     let valueReturned = FPDataValidator.validateString(phoneNumberString, validations: validations)
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for an invalid Phone Number - not 10 digits", closure: {
-                
-                beforeEach({
-                    validations  = [isPhoneNumberValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid  - not 10 digits", closure: {
                     let phoneNumberString = "40433311198"
                     let valueReturned = FPDataValidator.validateString(phoneNumberString, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
-                })
-                
-            })
-            
-            context("when checking for an invalid Phone Number - text", closure: {
-                
-                beforeEach({
-                    validations  = [isPhoneNumberValidation]
-                })
-                
-                it("is invalid", closure: {
-                    let phoneNumberString = "TETSING"
-                    let valueReturned = FPDataValidator.validateString(phoneNumberString, validations: validations)
-                    expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
             })
@@ -224,23 +152,15 @@ class FPDataValidatorSpec: QuickSpec {
                         expect(valueReturned.isValid).to(beTrue())
                     })
                     
-                })
-                
-                context("when checking for an invalid Full Name", closure: {
-                    
-                    beforeEach({
-                        validations  = [isFullNameValidation]
-                    })
-                    
-                    it("is invalid", closure: {
+                    it("is invalid - one word", closure: {
                         let fullNameString = "FirstPerson"
                         let valueReturned = FPDataValidator.validateString(fullNameString, validations: validations)
                         expect(valueReturned.isValid).to(beFalse())
-                        expect(valueReturned.errorMessages).toNot(beNil())
+                        expect(valueReturned.errorMessages).toNot(beEmpty())
                     })
+
                     
                 })
-            
         })
 
 //MARK:- String Validator - String length Range
@@ -261,38 +181,22 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for an invalid String length Range - More characters than Max", closure: {
-                
-                beforeEach({
-                    validations  = [isStringLengthRangeValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - More characters than Max", closure: {
                     let string = "Hello1234567"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
-            })
-            
-            context("when checking for an invalid String length Range - Less characters than Min", closure: {
-                
-                beforeEach({
-                    validations  = [isStringLengthRangeValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - Less characters than Min", closure: {
                     let string = "1P"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-
             
         })
         
@@ -314,24 +218,14 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for an invalid String length ", closure: {
-                
-                beforeEach({
-                    validations  = [isStringLengthValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - wrong Length ", closure: {
                     let string = "Hello1234567"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
             })
-            
-            
         })
 
 //MARK:- String Validator - Number of Special Characters Range
@@ -352,39 +246,21 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            
-            context("when checking for an invalid Special Characters Range - More than Max", closure: {
-                
-                beforeEach({
-                    validations  = [isSpecialCharactersRangeValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - More than Max", closure: {
                     let string = "Hello^%$#@@"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
-            })
-            
-            context("when checking for an invalid Special Characters Range - Less than Min", closure: {
-                
-                beforeEach({
-                    validations  = [isSpecialCharactersRangeValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - Less than Min", closure: {
                     let string = "1P"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
             })
-            
-            
         })
         
 //MARK:- String Validator - Number of Special Characters equal to
@@ -405,24 +281,15 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            context("when checking for invalid Special Characters", closure: {
-                
-                beforeEach({
-                    validations  = [isSpecialCharactersValidation]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - wrong number of special Characters", closure: {
                     let string = "Hello@!$%"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-            
-            
-            
         })
         
 
@@ -445,38 +312,22 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            context("when checking for invalid Numbers in String - Less than Min", closure: {
-                
-                beforeEach({
-                    validations  = [isNumbersRange]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - Less than Min", closure: {
                     let string = "Hello"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
-                })
-                
-            })
-            
-            context("when checking for invalid Numbers in String - More than Max", closure: {
-                
-                beforeEach({
-                    validations  = [isNumbersRange]
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
                 
                 it("is invalid", closure: {
                     let string = "Hello12345"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-
-            
         })
         
 
@@ -499,22 +350,15 @@ class FPDataValidatorSpec: QuickSpec {
                     expect(valueReturned.isValid).to(beTrue())
                 })
                 
-            })
-            context("when checking for invalid Numbers in String", closure: {
-                
-                beforeEach({
-                    validations  = [isNumbers]
-                })
-                
-                it("is invalid", closure: {
+                it("is invalid - number of numbers is wrong", closure: {
                     let string = "Hello"
                     let valueReturned = FPDataValidator.validateString(string, validations: validations)
                     expect(valueReturned.isValid).to(beFalse())
-                    expect(valueReturned.errorMessages).toNot(beNil())
+                    expect(valueReturned.errorMessages).toNot(beEmpty())
                 })
+
                 
             })
-            
         })
 
 

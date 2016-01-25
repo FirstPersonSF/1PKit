@@ -11,11 +11,9 @@ import Foundation
 
 public class FPDataValidator {
     
-    
-    
-    
 //MARK:- Public Validation Methods
-   class public func validateString(string: String,validations: [FPStringValidations]) -> (isValid: Bool, errorMessages: [String]?) {
+    
+    class public func validateString(string: String, validations: [FPStringValidations]) -> (isValid: Bool, errorMessages: [String]?) {
         
         if(validations.count <= 0) {
             return (isValid: false, errorMessages: nil)
@@ -24,96 +22,89 @@ public class FPDataValidator {
         var errorMessages = [String]()
         var isValid : Bool = true
         
-        for var validation in validations {
+        for validation in validations {
             switch validation {
+            
             case let .isEmail(errorMessage):
-                let emailPassed = FPDataValidator.isEmail(string)
-                if emailPassed != true {
+                if !FPDataValidator.isEmail(string) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .isURL(errorMessage):
-                let urlPassed = FPDataValidator.isURL(string)
-                if urlPassed != true {
+                if !FPDataValidator.isURL(string) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .isPhoneNumber(errorMessage):
-                let phoneNumberPassed = FPDataValidator.isPhoneNumber(string)
-                if phoneNumberPassed != true {
+                if !FPDataValidator.isPhoneNumber(string) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .isFullName(errorMessage):
-                let fullNamePassed = FPDataValidator.isFullName(string)
-                if fullNamePassed != true {
+                if !FPDataValidator.isFullName(string) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsCharactersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsCharactersRangePassed = FPDataValidator.containsCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
-                if containsCharactersRangePassed != true {
+                if !FPDataValidator.containsCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsCharactersLength(equalToNum, errorMessage):
-                let containsCharactersLengthPassed = FPDataValidator.containsCharactersLength(string, equalTo: equalToNum)
-                if containsCharactersLengthPassed != true {
+                if !FPDataValidator.containsCharactersLength(string, equalTo: equalToNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsSpecialCharactersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsSpecialCharactersRangePassed = FPDataValidator.containsSpecialCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
-                if containsSpecialCharactersRangePassed != true {
+                if !FPDataValidator.containsSpecialCharactersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsSpecialCharactersLength(equalToNum, errorMessage):
-                let containsSpecialCharactersLength = FPDataValidator.containsSpecialCharactersLength(string, equalTo: equalToNum)
-                if containsSpecialCharactersLength != true {
+                if !FPDataValidator.containsSpecialCharactersLength(string, equalTo: equalToNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsNumbersRange(lessThanNum, greaterThanNum, errorMessage):
-                let containsNumbersRangePassed = FPDataValidator.containsNumbersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum)
-                if containsNumbersRangePassed != true {
+                if !FPDataValidator.containsNumbersRange(string, lessThan: lessThanNum, greaterThan: greaterThanNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             case let .containsNumbersLength(equalToNum, errorMessage):
-                let containsNumbersLengthPassed = FPDataValidator.containsNumbersLength(string, equalTo: equalToNum)
-                if containsNumbersLengthPassed != true {
+                if !FPDataValidator.containsNumbersLength(string, equalTo: equalToNum) {
                     isValid = false
                     errorMessages.append(errorMessage)
                 }
-                break
+                
             }
         }
         
-        return(isValid: isValid,errorMessages: errorMessages)
-    
+        return(isValid: isValid, errorMessages: errorMessages)
+
     }
     
-    
 //MARK:- Internal Methods - String Validations
-    class private func isEmail(string: String) -> Bool{
+    
+    class private func isEmail(string: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        
         return emailTest.evaluateWithObject(string)
     }
     
-    class private func isURL(string: String) -> Bool{
+    class private func isURL(string: String) -> Bool {
         let urlRegEx = "(?i)https?://(?:www\\.)?\\S+(?:/|\\b)"
         let urlTest = NSPredicate(format: "SELF MATCHES %@", urlRegEx)
+        
         return urlTest.evaluateWithObject(string)
     }
     
@@ -129,17 +120,15 @@ public class FPDataValidator {
         let passed = phoneTest1.evaluateWithObject(string) || phoneTest2.evaluateWithObject(string) || phoneTest3.evaluateWithObject(string)
         
         return passed
-        
     }
     
     class private func isFullName(string: String) -> Bool {
-        
         let nameArray: [String] = string.characters.split { $0 == " " }.map { String($0) }
+        
         return nameArray.count >= 2
     }
     
     class private func containsCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
-        
         var passed = true
         let length = string.characters.count
         if let lessThanNum = lessThan {
@@ -158,11 +147,11 @@ public class FPDataValidator {
     
     class private func containsCharactersLength(string: String, equalTo: Int) -> Bool {
         let length = string.characters.count
+        
         return length == equalTo
     }
     
     class private func containsSpecialCharactersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
-        
         var passed = true
         let specialCharRegex = "[^A-Za-z0-9]"
         var count = 0
@@ -203,8 +192,6 @@ public class FPDataValidator {
     }
     
     class private func containsNumbersRange(string: String, lessThan: Int?, greaterThan: Int?) -> Bool {
-        
-        
         var passed = true
         let numberRegex = "[0-9]$"
         var count = 0
@@ -227,7 +214,6 @@ public class FPDataValidator {
         }
         
         return passed
-
     }
     
     class private func containsNumbersLength(string: String, equalTo: Int) -> Bool {
@@ -240,10 +226,9 @@ public class FPDataValidator {
                 count++
             }
         }
+        
         return count == equalTo
     }
-
-
     
 }
 

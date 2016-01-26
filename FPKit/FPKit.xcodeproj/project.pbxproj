@@ -14,6 +14,7 @@
 		3D8B9E131C51A16F002B092E /* FPLazyImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */; };
 		3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */; };
 		3D8B9E171C51C549002B092E /* FPLazyImageViewSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */; };
+		670F7C221C56EFB10078737F /* FPPaginatedScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */; };
 		677F345A1C51AADC00F57223 /* FPDataValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F34591C51AADC00F57223 /* FPDataValidator.swift */; };
 		677F345C1C51AAED00F57223 /* FPDataValidations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F345B1C51AAED00F57223 /* FPDataValidations.swift */; };
 		677F345E1C530E7E00F57223 /* FPDataValidatorSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F345D1C530E7E00F57223 /* FPDataValidatorSpec.swift */; };
@@ -40,6 +41,7 @@
 		3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageView.swift; sourceTree = "<group>"; };
 		3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageResult.swift; sourceTree = "<group>"; };
 		3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageViewSpec.swift; sourceTree = "<group>"; };
+		670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPPaginatedScrollViewController.swift; sourceTree = "<group>"; };
 		677F34591C51AADC00F57223 /* FPDataValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidator.swift; sourceTree = "<group>"; };
 		677F345B1C51AAED00F57223 /* FPDataValidations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidations.swift; sourceTree = "<group>"; };
 		677F345D1C530E7E00F57223 /* FPDataValidatorSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidatorSpec.swift; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 		3D8B9E111C51A119002B092E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				670F7C221C56EFB10078737F /* FPPaginatedScrollViewController.swift in Sources */,
 				677F345C1C51AAED00F57223 /* FPDataValidations.swift in Sources */,
 				677F345A1C51AADC00F57223 /* FPDataValidator.swift in Sources */,
 				3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */,

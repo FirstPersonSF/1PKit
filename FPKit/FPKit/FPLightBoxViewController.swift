@@ -11,21 +11,25 @@ import UIKit
 
 struct FPLightBoxViewControllerConstants {
     static let dismissalFlickVelocityMagnitude: CGFloat = 2000.0
+    static let mediumAnimationDuration = 0.4
+    static let fastAnimationDuration = 0.2
 }
 
 class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestureRecognizerDelegate {
     
     //MARK:- Properties
-    var scrollView: UIScrollView!
+    
     var image: UIImage!
     var referenceImageView: UIImageView!
-    var imageView: UIImageView!
-    var backgroundView: UIView!
+    var backgroundColor: UIColor!
     
-    var animator: UIDynamicAnimator!
-    var referenceFrame: CGRect!
-    var imageWidth: CGFloat!
-    var imageHeight: CGFloat!
+    private var imageView: UIImageView!
+    private var backgroundView: UIView!
+    private var scrollView: UIScrollView!
+    private var animator: UIDynamicAnimator!
+    private var referenceFrame: CGRect!
+    private var imageWidth: CGFloat!
+    private var imageHeight: CGFloat!
     //MARK:- Flags
     var isPresented = false
     
@@ -69,7 +73,13 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         self.scrollView.showsVerticalScrollIndicator = false
         self.scrollView.backgroundColor = UIColor.clearColor()
         
-        self.backgroundView.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
+        if let color = self.backgroundColor {
+            self.backgroundView.backgroundColor = color
+        }
+        else {
+            self.backgroundView.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
+        }
+        
         self.view.addSubview(self.scrollView)
         
         
@@ -141,7 +151,7 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         print("Width Ratio :\(widthRatio)")
         
         
-        UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+        UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
             ()-> Void in
             
             self.imageView.frame = CGRectMake(0,0,widthImage,heightImage)
@@ -305,20 +315,17 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
                     push.action = {
                         if !CGRectIntersectsRect(self.view.frame, self.imageView.frame) {
                             //print("Outside")
-                            UIView.animateWithDuration(1.0 , delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+                            UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration , delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                                 self.backgroundView.alpha = 0
                                 }, completion: {
                                     (completed) in
-                                    self.dismissViewControllerAnimated(false, completion: {
-                                        (completed) in
-                                        print("Completed")
-                                    })
+                                    NSTimer.scheduledTimerWithTimeInterval(0.4, target: self, selector: "dismiss", userInfo: nil, repeats: false)
                             })
                         }
                     }
                 }
                 else {
-                    UIView.animateWithDuration(0.2, delay: 0.0, options: .CurveLinear, animations: {
+                    UIView.animateWithDuration(FPLightBoxViewControllerConstants.fastAnimationDuration , delay: 0.0, options: .CurveLinear, animations: {
                         () -> Void in
                         self.imageView.center = self.view.center
                         }, completion: nil)
@@ -326,5 +333,12 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
             }
             
         }
+    }
+    
+    func dismiss() {
+        self.dismissViewControllerAnimated(false, completion: {
+            (completed) in
+            print("Completed")
+        })
     }
 }

@@ -13,48 +13,90 @@ struct FPLightBoxViewControllerConstants {
     static let dismissalFlickVelocityMagnitude: CGFloat = 2000.0
     static let mediumAnimationDuration = 0.4
     static let fastAnimationDuration = 0.2
+    static let defaultZoomFactor: CGFloat = 3.0
 }
 
-class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestureRecognizerDelegate {
+public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestureRecognizerDelegate {
     
     //MARK:- Properties
     
-    var image: UIImage!
-    var referenceImageView: UIImageView!
-    var backgroundColor: UIColor!
+    public var image: UIImage!
+    public var referenceImageView: UIImageView!
+    public var backgroundViewColor: UIColor!
+    public var backgroundViewAlpha: Float!
+    public var maximumZoomFactor: Float!
     
     private var imageView: UIImageView!
+    private var finalViewAlpha: CGFloat!
     private var backgroundView: UIView!
     private var scrollView: UIScrollView!
     private var animator: UIDynamicAnimator!
     private var referenceFrame: CGRect!
     private var imageWidth: CGFloat!
     private var imageHeight: CGFloat!
+    private var prevWidth: CGFloat!
+    private var prevHeight: CGFloat!
+    private var finalZoomFactor: CGFloat!
+    
     //MARK:- Flags
-    var isPresented = false
+    private var isPresented = false
     
     //MARK:- View Controller Methods
-    override func viewDidLoad() {
+    override  public func viewDidLoad() {
         super.viewDidLoad()
         self.setupUI()
         
         self.animator = UIDynamicAnimator(referenceView: self.scrollView)
         
+        //Hooking up the flick gesture and adding it to the Image View
         let flickGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handleFlick:" )
         flickGestureRecognizer.delegate = self
         self.imageView.addGestureRecognizer(flickGestureRecognizer)
+        
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         self.snapIntoPlace()
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override public func prefersStatusBarHidden() -> Bool {
         return true;
     }
     
+    override public func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.AllButUpsideDown
+    }
     
+    //MARK:- Orientation change
+    
+    override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        
+        //Before rotation
+        self.prevWidth = self.imageView.frame.size.width
+        self.prevHeight = self.imageView.frame.size.height
+        
+        let midPoint = CGPointMake((size.height/2), (size.width/2))
+        var point = self.view.convertPoint(midPoint, toView: self.imageView)
+        point.x = point.x * self.scrollView.zoomScale
+        point.y = point.y * self.scrollView.zoomScale
+        let xRatio = (point.x / self.imageView.frame.size.width)
+        let yRatio = (point.y / self.imageView.frame.size.height)
+        
+        coordinator.animateAlongsideTransition({
+            (context: UIViewControllerTransitionCoordinatorContext ) -> Void in
+            
+            //During rotation
+            self.switchingToSize(size, xRatio : xRatio,yRatio: yRatio)
+            
+            })
+            {
+                (context: UIViewControllerTransitionCoordinatorContext) -> Void in
+                
+                //After rotation
+        }
+    }
     
     //MARK:- Layout Methods
     func setupUI() {
@@ -66,20 +108,38 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         
         self.scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height))
         self.scrollView.delegate = self
-        self.scrollView.maximumZoomScale = 5.0
+        
         self.scrollView.directionalLockEnabled = true
         self.scrollView.scrollEnabled = true
         self.scrollView.showsHorizontalScrollIndicator = false
         self.scrollView.showsVerticalScrollIndicator = false
         self.scrollView.backgroundColor = UIColor.clearColor()
         
-        if let color = self.backgroundColor {
+        if let color = self.backgroundViewColor {
             self.backgroundView.backgroundColor = color
         }
         else {
             self.backgroundView.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
         }
         
+        if let alpha = self.backgroundViewAlpha {
+            self.finalViewAlpha = CGFloat(alpha)
+        }
+        else {
+            self.finalViewAlpha = 1.0
+        }
+        
+        //Checking for passed zoomFactor
+        if let factor = self.maximumZoomFactor{
+            self.finalZoomFactor = CGFloat(factor)
+        }
+        else
+        {
+            self.finalZoomFactor = FPLightBoxViewControllerConstants.defaultZoomFactor
+        }
+        
+        
+        self.scrollView.maximumZoomScale = self.finalZoomFactor
         self.view.addSubview(self.scrollView)
         
         
@@ -92,7 +152,6 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
                 //Using the reference frame to set Up ImageView
                 self.imageView = UIImageView(frame: self.referenceFrame)
                 self.imageView.image = self.image
-                //self.imageView.contentMode = .ScaleToFill
                 self.imageView.contentMode = self.referenceImageView.contentMode
                 self.imageView.clipsToBounds = false
                 self.imageView.userInteractionEnabled = true
@@ -102,7 +161,6 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
                 self.imageView = UIImageView(image: self.image)
                 self.imageView.center = self.view.center
             }
-            print("Content size \(self.scrollView.contentSize)")
             self.scrollView.addSubview(self.imageView)
             
         }
@@ -117,38 +175,52 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         
         var widthImage: CGFloat
         var heightImage: CGFloat
-        var heightRatio, widthRatio : CGFloat
+        var heightRatio : CGFloat
+        var widthRatio : CGFloat
         
         let currentWidth = self.imageView.frame.size.width
         let currentHeight = self.imageView.frame.size.height
         
         let imageAspect = self.imageWidth / self.imageHeight
-        print("Image Aspect :\(imageAspect)")
+        
         
         let deviceWidth = self.view.frame.size.width
         let deviceHeight = self.view.frame.size.height
         let deviceAspect = (deviceWidth/deviceHeight)
         
         
+        var actualImageWidth: CGFloat = 0
+        var actualImageHeight: CGFloat = 0
         
-        if deviceAspect > 1 && imageAspect > 1 {
-            heightImage = deviceHeight
+        if let image = self.referenceImageView.image {
+            actualImageWidth = image.size.width
+            actualImageHeight = image.size.height
+        }
+        
+        
+        if deviceAspect > 1 {
+            if actualImageHeight > 0  && actualImageHeight >= deviceHeight {
+                heightImage = deviceHeight
+            }
+            else {
+                heightImage = actualImageWidth
+            }
+            
             widthImage = imageAspect * heightImage
         }
         else {
-            widthImage = deviceWidth
+            if actualImageWidth > 0  && actualImageWidth >= deviceWidth {
+                widthImage = deviceWidth
+            }
+            else {
+                widthImage = actualImageWidth
+            }
             heightImage = (widthImage / imageAspect)
         }
         
         
-        print("Width Image \(widthImage)")
-        print("Height Image \(heightImage)")
-        
-        heightRatio = heightImage / currentHeight
-        widthRatio = widthImage / currentWidth
-        
-        print("Height Ratio :\(heightRatio)")
-        print("Width Ratio :\(widthRatio)")
+        heightRatio = (heightImage / currentHeight)
+        widthRatio = (widthImage / currentWidth)
         
         
         UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
@@ -156,27 +228,26 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
             
             self.imageView.frame = CGRectMake(0,0,widthImage,heightImage)
             self.imageView.center = self.view.center
-            self.backgroundView.alpha = 1
+            self.backgroundView.alpha = self.finalViewAlpha
             
             }, completion: nil)
         self.imageView.contentMode = .ScaleToFill
         self.scrollView.minimumZoomScale = self.scrollView.zoomScale
+        self.scrollView.maximumZoomScale = self.scrollView.minimumZoomScale * self.finalZoomFactor
         self.scrollView.contentSize = self.imageView.frame.size
         self.isPresented = true
-        print("Scroll view content size after animation: \(self.scrollView.contentSize)")
-        print("Current zoom scale: \(self.scrollView.zoomScale)")
-        print("Image View size after animation \(self.imageView.frame.size)")
     }
     
     //MARK:- Scroll View Delegate Methods
-    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+    public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         return self.imageView
     }
     
-    func scrollViewDidZoom(scrollView: UIScrollView) {
+    public func scrollViewDidZoom(scrollView: UIScrollView) {
         self.centerScrollViewContents()
-        print("Image View size while zooming: \(self.imageView.frame.size)")
-        print("Scroll view content size while zooming: \(self.scrollView.contentSize)")
+    }
+    
+    public func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
     }
     
     //MARK:- Helper Methods
@@ -270,6 +341,7 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         return referenceFrame
         
     }
+    
     func centerScrollViewContents() {
         let boundsSize = self.scrollView.bounds.size
         var contentsFrame = self.imageView.frame
@@ -287,6 +359,104 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
         }
         self.imageView.frame = contentsFrame
     }
+    
+    func switchingToSize(size: CGSize,xRatio: CGFloat, yRatio: CGFloat) {
+        
+        self.backgroundView.frame = CGRectMake(0, 0, size.width, size.height)
+        self.scrollView.frame = CGRectMake(0, 0, size.width, size.height)
+        
+        var heightImage: CGFloat
+        var widthImage: CGFloat
+        
+        let imageAspect = self.imageWidth / self.imageHeight
+        
+        let deviceWidth = size.width
+        let deviceHeight = size.height
+        let deviceAspect = (deviceWidth/deviceHeight)
+        
+        var actualImageWidth: CGFloat = 0
+        var actualImageHeight: CGFloat = 0
+        
+        if let image = self.referenceImageView.image {
+            actualImageWidth = image.size.width
+            actualImageHeight = image.size.height
+        }
+        
+        
+        if deviceAspect > 1 {
+            if actualImageHeight > 0  && actualImageHeight >= deviceHeight {
+                heightImage = deviceHeight
+            }
+            else {
+                heightImage = actualImageWidth
+            }
+            
+            widthImage = imageAspect * heightImage
+        }
+        else {
+            if actualImageWidth > 0  && actualImageWidth >= deviceWidth {
+                widthImage = deviceWidth
+            }
+            else {
+                widthImage = actualImageWidth
+            }
+            heightImage = (widthImage / imageAspect)
+        }
+        
+        let newWidth = widthImage * self.scrollView.zoomScale
+        let newHeight = heightImage * self.scrollView.zoomScale
+        
+        UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+            
+            ()-> Void in
+            
+            self.imageView.frame = CGRectMake(0, 0, newWidth, newHeight)
+            self.imageView.center = self.view.center
+            
+            }, completion: nil)
+        self.scrollView.minimumZoomScale = 1.0
+        self.scrollView.maximumZoomScale = self.scrollView.minimumZoomScale * self.finalZoomFactor
+        self.scrollView.contentSize = self.imageView.frame.size
+        
+        
+        
+        //Calculating center point and scrollviews contentoffset to center the point on orirntation change
+        if self.scrollView.zoomScale > self.scrollView.minimumZoomScale {
+            if (self.prevHeight != newHeight || self.prevWidth != newWidth) {
+                let pointCenter = CGPointMake(self.imageView.frame.size.width * xRatio, self.imageView.frame.size.height * yRatio)
+                self.scrollView.contentOffset = CGPointMake(0,0)
+                self.scrollView.contentSize = self.imageView.frame.size
+                var pointX : CGFloat = 0
+                var pointY : CGFloat = 0
+                pointX = pointCenter.x - (size.width * 0.5)
+                
+                pointY = pointCenter.y - (size.height * 0.5)
+                
+                if pointX < 0 {
+                    pointX = 0
+                }
+                if pointY < 0 {
+                    pointY = 0
+                }
+                
+                if pointY > abs(newHeight - (size.height)) {
+                    pointY = abs(newHeight - (size.height))
+                }
+                
+                if pointX > abs(newWidth - (size.width)) {
+                    pointX = abs(newWidth - (size.width))
+                }
+                let newContentOffset = CGPointMake(pointX, pointY)
+                UIView.animateWithDuration(FPLightBoxViewControllerConstants.fastAnimationDuration, animations: { () -> Void in
+                    self.scrollView.contentOffset = newContentOffset
+                })
+                
+            }
+            
+        }
+        self.centerScrollViewContents()
+    }
+    
     //MARK:- Gesture Recognizer methods
     func handleFlick(recognizer:UIPanGestureRecognizer) {
         if isPresented && self.scrollView.zoomScale == self.scrollView.minimumZoomScale {
@@ -314,7 +484,6 @@ class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, UIGestur
                     self.animator.addBehavior(push)
                     push.action = {
                         if !CGRectIntersectsRect(self.view.frame, self.imageView.frame) {
-                            //print("Outside")
                             UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration , delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                                 self.backgroundView.alpha = 0
                                 }, completion: {

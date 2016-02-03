@@ -145,7 +145,8 @@ public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, U
         
         if self.image != nil {
             if self.referenceImageView != nil {
-                self.referenceFrame = self.referenceImageView.frame
+                //Initializing ReferenceFrame
+                self.referenceFrame = self.referenceImageView.convertRect(self.referenceImageView.frame, toView: nil)
                 //Setting Reference frame
                 self.referenceFrame = self.setReferenceFrameForMode(self.referenceImageView.contentMode)
                 
@@ -175,11 +176,7 @@ public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, U
         
         var widthImage: CGFloat
         var heightImage: CGFloat
-        var heightRatio : CGFloat
-        var widthRatio : CGFloat
-        
-        let currentWidth = self.imageView.frame.size.width
-        let currentHeight = self.imageView.frame.size.height
+
         
         let imageAspect = self.imageWidth / self.imageHeight
         
@@ -219,10 +216,6 @@ public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, U
         }
         
         
-        heightRatio = (heightImage / currentHeight)
-        widthRatio = (widthImage / currentWidth)
-        
-        
         UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
             ()-> Void in
             
@@ -253,7 +246,6 @@ public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, U
     //MARK:- Helper Methods
     
     func setReferenceFrameForMode(mode: UIViewContentMode) -> CGRect{
-        
         
         let widthRatio = self.referenceImageView.bounds.size.width / (self.referenceImageView.image != nil ? (self.referenceImageView.image?.size.width)! : self.referenceImageView.bounds.size.width)
         let heightRatio = self.referenceImageView.bounds.size.height / (self.referenceImageView.image != nil ? (self.referenceImageView.image?.size.height)! : self.referenceImageView.bounds.size.height)

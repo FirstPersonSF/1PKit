@@ -11,7 +11,7 @@ import UIKit
 
 
 
-class FPPaginatedScrollViewController : UIViewController {
+/*class FPPaginatedScrollViewController : UIViewController {
     
     var scrollView: UIScrollView!
     var pageViewController: UIPageViewController!
@@ -72,4 +72,4 @@ class FPPaginatedScrollViewController : UIViewController {
     
     
     
-}
+}*/

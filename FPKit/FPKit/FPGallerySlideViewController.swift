@@ -4,16 +4,29 @@
 //
 //  Created by Sruti Harikumar on 5/2/16.
 //  Copyright © 2016 First Person. All rights reserved.
-//
+
 
 import Foundation
 import UIKit
 
-class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate {
+public struct FPGallerySlideViewControllerConstants {
+    static let defaultZoomFactor: CGFloat = 3.0
+    static let dismissalFlickVelocityMagnitude: CGFloat = 1500
+}
+
+
+@objc protocol FPGallerySlideViewControllerDelegate {
+    func didDismissViewController(slideController: FPGallerySlideViewController)
+}
+
+public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelegate {
 
 
 //MARK:-Properties
-    private var image: UIImage!
+    public var pageIndex: Int!
+    var delegate: FPGallerySlideViewControllerDelegate?
+    
+    private  var image: UIImage!
     private var backgroundViewColor: UIColor!
     private var backgroundViewAlpha: Float!
     private var maximumZoomFactor: Float!
@@ -26,17 +39,44 @@ class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate {
     private var finalViewAlpha: CGFloat!
     private var animator: UIDynamicAnimator!
     
+    private var prevWidth: CGFloat!
+    private var prevHeight: CGFloat!
+    
+    private var flickGestureRecognizer : UIGestureRecognizer!
+    
+    
+//MARK:- Flags
+    private var isPresented = false
+    
 //MARK:- View Controller Methods
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
+        self.setupUI()
+        
+        self.animator = UIDynamicAnimator(referenceView: self.scrollView)
+        
+        //Hooking up the flick gesture and adding it to the Image View
+        flickGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handleFlick:" )
+        flickGestureRecognizer.delegate = self
+        self.imageView.addGestureRecognizer(flickGestureRecognizer)
+
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override public func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
     }
+    
+    override public func prefersStatusBarHidden() -> Bool {
+        return true;
+    }
+    
+    override public func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.AllButUpsideDown
+    }
 
-//MARK:- InitializationMethods
-    func initWithImage(image: UIImage,andBackgroundViewColor backgroundViewColor: UIColor?, andBackgroundViewAlpha backgroundViewAlpha: Float?) {
+
+//MARK:- Initialization Methods
+    public func initWithImage(image: UIImage,andBackgroundViewColor backgroundViewColor: UIColor?, andBackgroundViewAlpha backgroundViewAlpha: Float?) {
         self.image = image
         self.backgroundViewColor = backgroundViewColor
         self.backgroundViewAlpha = backgroundViewAlpha
@@ -80,7 +120,7 @@ class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate {
         }
         else
         {
-            self.finalZoomFactor = 5.0
+            self.finalZoomFactor = FPGallerySlideViewControllerConstants.defaultZoomFactor
         }
         
         
@@ -103,8 +143,120 @@ class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate {
             self.imageView = UIImageView()
             self.imageView.center = self.view.center
         }
+        self.isPresented = true
+    }
+//MARK:- Orientation Change methods
+    override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        
+        //Before rotation
+        self.prevWidth = self.imageView.frame.size.width
+        self.prevHeight = self.imageView.frame.size.height
+        
+        let midPoint = CGPointMake((size.height/2), (size.width/2))
+        var point = self.view.convertPoint(midPoint, toView: self.imageView)
+        point.x = point.x * self.scrollView.zoomScale
+        point.y = point.y * self.scrollView.zoomScale
+        let xRatio = (point.x / self.imageView.frame.size.width)
+        let yRatio = (point.y / self.imageView.frame.size.height)
+        
+        coordinator.animateAlongsideTransition({
+            (context: UIViewControllerTransitionCoordinatorContext ) -> Void in
+            
+            //During rotation
+            self.switchingToSize(size, xRatio : xRatio,yRatio: yRatio)
+            
+            })
+            {
+                (context: UIViewControllerTransitionCoordinatorContext) -> Void in
+                
+                //After rotation
+        }
     }
 
+//MARK:- User Interaction Methods
+    func handleFlick(recognizer:UIPanGestureRecognizer) {
+        
+        if isPresented && self.scrollView.zoomScale == self.scrollView.minimumZoomScale {
+            
+            if recognizer.state == UIGestureRecognizerState.Began {
+                
+            }
+            else if recognizer.state == UIGestureRecognizerState.Changed {
+                let translation = recognizer.translationInView(self.view)
+                if let view = recognizer.view {
+                    view.center = CGPoint(x:view.center.x + translation.x,
+                        y:view.center.y + translation.y)
+                }
+                recognizer.setTranslation(CGPointZero, inView: self.view)
+                
+            }
+            else if recognizer.state == UIGestureRecognizerState.Ended {
+                
+                
+                let velocity = recognizer.velocityInView(self.view)
+                let magnitude = sqrt((pow(velocity.x, 2.0) + pow(velocity.y, 2.0)))
+                if magnitude > FPGallerySlideViewControllerConstants.dismissalFlickVelocityMagnitude {
+                    let push = UIPushBehavior(items: [self.imageView], mode: UIPushBehaviorMode.Instantaneous)
+                    push.pushDirection = CGVectorMake(velocity.x * 0.3, velocity.y * 0.3);
+                    self.animator.addBehavior(push)
+                    push.action = {
+                        if !CGRectIntersectsRect(self.view.frame, self.imageView.frame) {
+                            UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration , delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+                                self.backgroundView.alpha = 0
+                                }, completion: {
+                                    (completed) in
+                                    
+                                    NSTimer.scheduledTimerWithTimeInterval(0.4, target: self, selector: "dismiss", userInfo: nil, repeats: false)
+                            })
+                        }
+                    }
+                }
+                else {
+                    UIView.animateWithDuration(FPLightBoxViewControllerConstants.fastAnimationDuration , delay: 0.0, options: .CurveLinear, animations: {
+                        () -> Void in
+                        self.imageView.center = self.view.center
+                        }, completion: nil)
+                }
+            }
+            
+        }
+    }
+    
+    func dismiss() {
+//        self.dismissViewControllerAnimated(false, completion: {
+//            (completed) in
+//            print("Completed")
+//        })
+        self.animator.removeAllBehaviors()
+        self.imageView.removeGestureRecognizer(self.flickGestureRecognizer)
+        delegate?.didDismissViewController(self)
+    }
+    
+//MARK:- Scroll View Delegate Methods
+    public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+        return self.imageView
+    }
+    
+    public func scrollViewDidZoom(scrollView: UIScrollView) {
+        self.centerScrollViewContents()
+    }
+    
+    public func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+    }
+
+//MARK:- Gesture Recognizer delegate Methods
+    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if gestureRecognizer == self.flickGestureRecognizer {
+            let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
+            let movement = panGestureRecognizer.translationInView(self.view)
+            if abs(movement.x) > abs(movement.y) {
+                return false
+            }
+        }
+        return true
+    }
 //MARK:- Helper Methods
     func getImageDisplayDimensions(image: UIImage) -> CGSize {
         var widthImage: CGFloat
@@ -162,6 +314,69 @@ class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate {
         }
         self.imageView.frame = contentsFrame
     }
+    
+    func switchingToSize(size: CGSize,xRatio: CGFloat, yRatio: CGFloat) {
+        
+        self.backgroundView.frame = CGRectMake(0, 0, size.width, size.height)
+        self.scrollView.frame = CGRectMake(0, 0, size.width, size.height)
+        
+        let imageDimensions = self.getImageDisplayDimensions(self.image)
+        let widthImage = imageDimensions.width
+        let heightImage = imageDimensions.height
+        
+        let newWidth = widthImage * self.scrollView.zoomScale
+        let newHeight = heightImage * self.scrollView.zoomScale
+        UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+            
+            ()-> Void in
+            
+            self.imageView.frame = CGRectMake(0, 0, newWidth, newHeight)
+            self.imageView.center = self.view.center
+            
+            }, completion: nil)
+        self.scrollView.minimumZoomScale = 1.0
+        self.scrollView.maximumZoomScale = self.scrollView.minimumZoomScale * self.finalZoomFactor
+        self.scrollView.contentSize = self.imageView.frame.size
+        
+        
+        
+        //Calculating center point and scrollviews contentoffset to center the point on orirntation change
+        if self.scrollView.zoomScale > self.scrollView.minimumZoomScale {
+            if (self.prevHeight != newHeight || self.prevWidth != newWidth) {
+                let pointCenter = CGPointMake(self.imageView.frame.size.width * xRatio, self.imageView.frame.size.height * yRatio)
+                self.scrollView.contentOffset = CGPointMake(0,0)
+                self.scrollView.contentSize = self.imageView.frame.size
+                var pointX : CGFloat = 0
+                var pointY : CGFloat = 0
+                pointX = pointCenter.x - (size.width * 0.5)
+                
+                pointY = pointCenter.y - (size.height * 0.5)
+                
+                if pointX < 0 {
+                    pointX = 0
+                }
+                if pointY < 0 {
+                    pointY = 0
+                }
+                
+                if pointY > abs(newHeight - (size.height)) {
+                    pointY = abs(newHeight - (size.height))
+                }
+                
+                if pointX > abs(newWidth - (size.width)) {
+                    pointX = abs(newWidth - (size.width))
+                }
+                let newContentOffset = CGPointMake(pointX, pointY)
+                UIView.animateWithDuration(FPLightBoxViewControllerConstants.fastAnimationDuration, animations: { () -> Void in
+                    self.scrollView.contentOffset = newContentOffset
+                })
+                
+            }
+            
+        }
+        self.centerScrollViewContents()
+    }
+
 
 
     

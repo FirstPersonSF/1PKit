@@ -14,6 +14,8 @@
 		3D8B9E131C51A16F002B092E /* FPLazyImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */; };
 		3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */; };
 		3D8B9E171C51C549002B092E /* FPLazyImageViewSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */; };
+		670820931C6527A70095F002 /* FPGallerySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670820921C6527A70095F002 /* FPGallerySlideViewController.swift */; };
+		670820D11C6546F80095F002 /* FPGalleryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670820D01C6546F80095F002 /* FPGalleryViewController.swift */; };
 		670F7C221C56EFB10078737F /* FPPaginatedScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */; };
 		670F7C611C583C480078737F /* FPLightBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670F7C601C583C480078737F /* FPLightBoxViewController.swift */; };
 		677F345A1C51AADC00F57223 /* FPDataValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677F34591C51AADC00F57223 /* FPDataValidator.swift */; };
@@ -42,6 +44,8 @@
 		3D8B9E121C51A16F002B092E /* FPLazyImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageView.swift; sourceTree = "<group>"; };
 		3D8B9E141C51A203002B092E /* FPLazyImageResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageResult.swift; sourceTree = "<group>"; };
 		3D8B9E161C51C549002B092E /* FPLazyImageViewSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLazyImageViewSpec.swift; sourceTree = "<group>"; };
+		670820921C6527A70095F002 /* FPGallerySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPGallerySlideViewController.swift; sourceTree = "<group>"; };
+		670820D01C6546F80095F002 /* FPGalleryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPGalleryViewController.swift; sourceTree = "<group>"; };
 		670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPPaginatedScrollViewController.swift; sourceTree = "<group>"; };
 		670F7C601C583C480078737F /* FPLightBoxViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPLightBoxViewController.swift; sourceTree = "<group>"; };
 		677F34591C51AADC00F57223 /* FPDataValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FPDataValidator.swift; sourceTree = "<group>"; };
@@ -135,6 +139,8 @@
 			children = (
 				670F7C211C56EFB10078737F /* FPPaginatedScrollViewController.swift */,
 				670F7C601C583C480078737F /* FPLightBoxViewController.swift */,
+				670820921C6527A70095F002 /* FPGallerySlideViewController.swift */,
+				670820D01C6546F80095F002 /* FPGalleryViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -250,7 +256,9 @@
 				670F7C221C56EFB10078737F /* FPPaginatedScrollViewController.swift in Sources */,
 				670F7C611C583C480078737F /* FPLightBoxViewController.swift in Sources */,
 				677F345C1C51AAED00F57223 /* FPDataValidations.swift in Sources */,
+				670820931C6527A70095F002 /* FPGallerySlideViewController.swift in Sources */,
 				677F345A1C51AADC00F57223 /* FPDataValidator.swift in Sources */,
+				670820D11C6546F80095F002 /* FPGalleryViewController.swift in Sources */,
 				3D8B9E151C51A203002B092E /* FPLazyImageResult.swift in Sources */,
 				3D8B9E131C51A16F002B092E /* FPLazyImageView.swift in Sources */,
 			);

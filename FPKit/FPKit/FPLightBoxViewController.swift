@@ -21,6 +21,7 @@ public class FPLightBoxViewController : UIViewController,UIScrollViewDelegate, U
     //MARK:- Properties
     
     public var image: UIImage!
+    public var images: [UIImage]!
     public var referenceImageView: UIImageView!
     public var backgroundViewColor: UIColor!
     public var backgroundViewAlpha: Float!

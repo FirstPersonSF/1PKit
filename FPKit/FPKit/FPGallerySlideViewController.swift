@@ -56,6 +56,18 @@ internal class FPGallerySlideViewController: UIViewController, UIScrollViewDeleg
         flickGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handleFlick:" )
         flickGestureRecognizer.delegate = self
         self.imageView.addGestureRecognizer(flickGestureRecognizer)
+        
+        //Hooking up double tap gesture
+        let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: "handleDoubleTap:")
+        doubleTapGestureRecognizer.delegate = self
+        doubleTapGestureRecognizer.numberOfTapsRequired = 2
+        self.imageView.addGestureRecognizer(doubleTapGestureRecognizer)
+        
+        //Hooking up single Tap gesture
+        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
+        singleTapGestureRecognizer.delegate = self
+        singleTapGestureRecognizer.numberOfTapsRequired = 1
+        self.imageView.addGestureRecognizer(singleTapGestureRecognizer)
 
     }
     
@@ -189,10 +201,23 @@ internal class FPGallerySlideViewController: UIViewController, UIScrollViewDeleg
         }
     }
     
-    func dismiss() {
-        self.animator.removeAllBehaviors()
-        self.imageView.removeGestureRecognizer(self.flickGestureRecognizer)
-        delegate?.didDismissViewController(self)
+    
+    func handleDoubleTap(recognizer: UITapGestureRecognizer) {
+        
+        if self.scrollView.zoomScale > self.scrollView.minimumZoomScale {
+            self.scrollView.setZoomScale(self.scrollView.minimumZoomScale, animated: true)
+        }
+        else {
+            let zoomRect = self.getZoomRectForScale(self.scrollView.maximumZoomScale, andCenter: recognizer.locationInView(self.view))
+            self.scrollView.zoomToRect(zoomRect, animated: true)
+        }
+    }
+    
+    func handleSingleTap(recognizer: UITapGestureRecognizer) {
+        self.dismiss()
+        UIView.animateWithDuration(FPGalleryViewControllerConstants.mediumAnimationDuration,animations: {
+            self.imageView.frame = CGRectMake(self.view.center.x, self.view.center.y, 0, 0)
+        })
     }
     
 //MARK:- Scroll View Delegate Methods
@@ -337,6 +362,29 @@ internal class FPGallerySlideViewController: UIViewController, UIScrollViewDeleg
         }
         self.centerScrollViewContents()
     }
+    
+    
+    func getZoomRectForScale(scale: CGFloat, andCenter center:CGPoint) -> CGRect {
+        
+        var zoomRect: CGRect = CGRect()
+        
+        zoomRect.size.height = self.scrollView.frame.height / scale
+        zoomRect.size.width = self.scrollView.frame.width / scale
+        
+        zoomRect.origin.x = center.x - (zoomRect.size.width / 2)
+        zoomRect.origin.y = center.y - (zoomRect.size.height / 2)
+        
+        return zoomRect
+    }
+    
+    
+//MARK:- Dismissing View Controller
+    func dismiss() {
+        self.animator.removeAllBehaviors()
+        self.imageView.removeGestureRecognizer(self.flickGestureRecognizer)
+        delegate?.didDismissViewController(self)
+    }
+
 
 
 

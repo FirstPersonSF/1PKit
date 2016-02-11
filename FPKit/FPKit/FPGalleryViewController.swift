@@ -22,6 +22,7 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
     public var backgroundViewAlpha: Float!
     
     private var images: [UIImage]!
+    private var backgroundView: UIView!
     private var pageViewController: UIPageViewController!
     private var referenceImageView: UIImageView!
     private var startIndex: Int!
@@ -32,6 +33,7 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
 //MARK:- View Controller Methods
     override public func viewDidLoad() {
         super.viewDidLoad()
+        
         self.setupUI()
         self.placeOverlayImage()
     }
@@ -59,6 +61,7 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
 //MARK:- User Interface Methods
     func setupUI() {
         self.imageView = UIImageView()
+        
         self.pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
         self.pageViewController.dataSource = self
 
@@ -68,6 +71,11 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
         if self.backgroundViewAlpha == nil {
             self.backgroundViewAlpha = FPGalleryViewControllerConstants.defaultBackgroundAlpha
         }
+        
+        self.backgroundView = UIView(frame: CGRectMake(0, 0, self.view.frame.width, self.view.frame.height))
+        self.backgroundView.backgroundColor = self.backgroundViewColor
+        self.backgroundView.alpha = CGFloat(self.backgroundViewAlpha)
+        self.view.addSubview(self.backgroundView)
     }
     
     func placeOverlayImage() {
@@ -131,8 +139,6 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
     public func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         
         let gallerySlideController = viewController as! FPGallerySlideViewController
-        /*let imageInViewController = gallerySlideController.image
-        let index = self.images.indexOf(imageInViewController)*/
         var index = Int(gallerySlideController.pageIndex)
         if index == 0 || index == NSNotFound {
             return nil
@@ -155,12 +161,12 @@ public class FPGalleryViewController: UIViewController, FPGallerySlideViewContro
 
     }
     
-    public func viewControllerAtIndex(index: Int) -> FPGallerySlideViewController?{
+    internal func viewControllerAtIndex(index: Int) -> FPGallerySlideViewController?{
         if (self.images.count == 0 ) || (index >= self.images.count) {
             return nil
         }
         let gallerySlideViewController = FPGallerySlideViewController()
-        gallerySlideViewController.initWithImage(self.images[index], andBackgroundViewColor: self.backgroundViewColor, andBackgroundViewAlpha: self.backgroundViewAlpha)
+        gallerySlideViewController.initWithImage(self.images[index])
         gallerySlideViewController.pageIndex = index
         gallerySlideViewController.delegate = self
         return gallerySlideViewController
@@ -190,8 +196,6 @@ func setReferenceFrameForMode(mode: UIViewContentMode) -> CGRect{
         let imageY = ((self.referenceFrame.size.height - imageHeight) / 2) + self.referenceFrame.origin.y
         referenceFrame = CGRectMake(imageX, imageY, imageWidth, imageHeight)
     case .ScaleToFill:
-        let imageWidth = self.referenceImageView.image != nil ? self.referenceImageView.image!.size.width : 0
-        let imageHeight = self.referenceImageView.image != nil ? self.referenceImageView.image!.size.height : 0
         referenceFrame = self.referenceImageView.frame
     case .Top:
         let imageWidth = self.referenceImageView.image != nil ? self.referenceImageView.image!.size.width : 0
@@ -248,8 +252,6 @@ func setReferenceFrameForMode(mode: UIViewContentMode) -> CGRect{
         let imageY = self.referenceFrame.origin.y + self.referenceFrame.size.height - imageHeight
         referenceFrame = CGRectMake(imageX, imageY, imageWidth, imageHeight)
     case .Redraw:
-        let imageWidth = self.referenceImageView.image != nil ? self.referenceImageView.image!.size.width : 0
-        let imageHeight = self.referenceImageView.image != nil ? self.referenceImageView.image!.size.height : 0
         referenceFrame = self.referenceImageView.frame
     }
     
@@ -299,8 +301,46 @@ func setReferenceFrameForMode(mode: UIViewContentMode) -> CGRect{
     
 //MARK:- FPGallerySlideViewControllerDelegate Methods
     func didDismissViewController(slideController: FPGallerySlideViewController) {
-        //print("Dismissing the Gallery")
-        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        UIView.animateWithDuration(FPGalleryViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+            
+            self.backgroundView.alpha = 0
+            
+            
+            }, completion: {
+                completed in
+                NSTimer.scheduledTimerWithTimeInterval(0.4, target: self, selector: "dismiss", userInfo: nil, repeats: false)
+                
+        })
+        
     }
+    func dismiss() {
+        self.dismissViewControllerAnimated(false, completion: nil)
+    }
+    
+//MARK:- Responding to Orientation change
+    override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        
+        //Before rotation
+        
+        coordinator.animateAlongsideTransition({
+            (context: UIViewControllerTransitionCoordinatorContext ) -> Void in
+            
+            //During rotation
+            UIView.animateWithDuration(FPGalleryViewControllerConstants.mediumAnimationDuration, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
+                
+                    self.backgroundView.frame = CGRectMake(0, 0, size.width, size.height)
+                
+                }, completion: nil)
+            
+            })
+            {
+                (context: UIViewControllerTransitionCoordinatorContext) -> Void in
+                
+                //After rotation
+        }
+    }
+
 
 }

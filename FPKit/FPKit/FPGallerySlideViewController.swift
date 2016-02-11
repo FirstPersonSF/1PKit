@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public struct FPGallerySlideViewControllerConstants {
+internal struct FPGallerySlideViewControllerConstants {
     static let defaultZoomFactor: CGFloat = 3.0
     static let dismissalFlickVelocityMagnitude: CGFloat = 1500
 }
@@ -19,20 +19,17 @@ public struct FPGallerySlideViewControllerConstants {
     func didDismissViewController(slideController: FPGallerySlideViewController)
 }
 
-public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelegate {
+internal class FPGallerySlideViewController: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelegate {
 
 
 //MARK:-Properties
-    public var pageIndex: Int!
+    internal var pageIndex: Int!
     var delegate: FPGallerySlideViewControllerDelegate?
     
     private  var image: UIImage!
-    private var backgroundViewColor: UIColor!
-    private var backgroundViewAlpha: Float!
     private var maximumZoomFactor: Float!
     
     private var imageView: UIImageView!
-    private var backgroundView: UIView!
     private var scrollView: UIScrollView!
     
     private var finalZoomFactor: CGFloat!
@@ -49,7 +46,7 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
     private var isPresented = false
     
 //MARK:- View Controller Methods
-    override public func viewDidLoad() {
+    override internal func viewDidLoad() {
         super.viewDidLoad()
         self.setupUI()
         
@@ -59,34 +56,41 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
         flickGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handleFlick:" )
         flickGestureRecognizer.delegate = self
         self.imageView.addGestureRecognizer(flickGestureRecognizer)
+        
+        //Hooking up double tap gesture
+        let doubleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: "handleDoubleTap:")
+        doubleTapGestureRecognizer.delegate = self
+        doubleTapGestureRecognizer.numberOfTapsRequired = 2
+        self.imageView.addGestureRecognizer(doubleTapGestureRecognizer)
+        
+        //Hooking up single Tap gesture
+        let singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
+        singleTapGestureRecognizer.delegate = self
+        singleTapGestureRecognizer.numberOfTapsRequired = 1
+        self.imageView.addGestureRecognizer(singleTapGestureRecognizer)
 
     }
     
-    override public func viewDidAppear(animated: Bool) {
+    override internal func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
     }
     
-    override public func prefersStatusBarHidden() -> Bool {
+    override internal func prefersStatusBarHidden() -> Bool {
         return true;
     }
     
-    override public func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+    override internal func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.AllButUpsideDown
     }
 
 
 //MARK:- Initialization Methods
-    public func initWithImage(image: UIImage,andBackgroundViewColor backgroundViewColor: UIColor?, andBackgroundViewAlpha backgroundViewAlpha: Float?) {
+    internal func initWithImage(image: UIImage) {
         self.image = image
-        self.backgroundViewColor = backgroundViewColor
-        self.backgroundViewAlpha = backgroundViewAlpha
     }
     
 //MARK:- User Interface Methods
     func setupUI() {
-        self.backgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height))
-        self.backgroundView.backgroundColor = UIColor.blackColor()
-        
         
         self.scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height))
         self.scrollView.delegate = self
@@ -96,23 +100,6 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
         self.scrollView.showsHorizontalScrollIndicator = false
         self.scrollView.showsVerticalScrollIndicator = false
         self.scrollView.backgroundColor = UIColor.clearColor()
-        
-        if let color = self.backgroundViewColor {
-            self.backgroundView.backgroundColor = color
-        }
-        else {
-            self.backgroundView.backgroundColor = UIColor(red: 0/255, green: 0/255, blue: 0/255, alpha: 0.8)
-        }
-        
-        if let alpha = self.backgroundViewAlpha {
-            self.finalViewAlpha = CGFloat(alpha)
-        }
-        else {
-            self.finalViewAlpha = 1.0
-        }
-        
-        self.backgroundView.alpha = self.finalViewAlpha
-        self.view.addSubview(self.backgroundView)
         
         //Checking for passed zoomFactor
         if let factor = self.maximumZoomFactor{
@@ -146,7 +133,7 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
         self.isPresented = true
     }
 //MARK:- Orientation Change methods
-    override public func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override internal func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         
         //Before rotation
@@ -179,21 +166,15 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
         
         if isPresented && self.scrollView.zoomScale == self.scrollView.minimumZoomScale {
             
-            if recognizer.state == UIGestureRecognizerState.Began {
-                
-            }
-            else if recognizer.state == UIGestureRecognizerState.Changed {
+            switch recognizer.state {
+            case .Changed:
                 let translation = recognizer.translationInView(self.view)
                 if let view = recognizer.view {
                     view.center = CGPoint(x:view.center.x + translation.x,
                         y:view.center.y + translation.y)
                 }
                 recognizer.setTranslation(CGPointZero, inView: self.view)
-                
-            }
-            else if recognizer.state == UIGestureRecognizerState.Ended {
-                
-                
+            case .Ended:
                 let velocity = recognizer.velocityInView(self.view)
                 let magnitude = sqrt((pow(velocity.x, 2.0) + pow(velocity.y, 2.0)))
                 if magnitude > FPGallerySlideViewControllerConstants.dismissalFlickVelocityMagnitude {
@@ -201,14 +182,10 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
                     push.pushDirection = CGVectorMake(velocity.x * 0.3, velocity.y * 0.3);
                     self.animator.addBehavior(push)
                     push.action = {
+                        
                         if !CGRectIntersectsRect(self.view.frame, self.imageView.frame) {
-                            UIView.animateWithDuration(FPLightBoxViewControllerConstants.mediumAnimationDuration , delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
-                                self.backgroundView.alpha = 0
-                                }, completion: {
-                                    (completed) in
-                                    
-                                    NSTimer.scheduledTimerWithTimeInterval(0.4, target: self, selector: "dismiss", userInfo: nil, repeats: false)
-                            })
+                            
+                            self.dismiss()
                         }
                     }
                 }
@@ -218,35 +195,45 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
                         self.imageView.center = self.view.center
                         }, completion: nil)
                 }
+            default:
+                break
             }
-            
         }
     }
     
-    func dismiss() {
-//        self.dismissViewControllerAnimated(false, completion: {
-//            (completed) in
-//            print("Completed")
-//        })
-        self.animator.removeAllBehaviors()
-        self.imageView.removeGestureRecognizer(self.flickGestureRecognizer)
-        delegate?.didDismissViewController(self)
+    
+    func handleDoubleTap(recognizer: UITapGestureRecognizer) {
+        
+        if self.scrollView.zoomScale > self.scrollView.minimumZoomScale {
+            self.scrollView.setZoomScale(self.scrollView.minimumZoomScale, animated: true)
+        }
+        else {
+            let zoomRect = self.getZoomRectForScale(self.scrollView.maximumZoomScale, andCenter: recognizer.locationInView(self.view))
+            self.scrollView.zoomToRect(zoomRect, animated: true)
+        }
+    }
+    
+    func handleSingleTap(recognizer: UITapGestureRecognizer) {
+        self.dismiss()
+        UIView.animateWithDuration(FPGalleryViewControllerConstants.mediumAnimationDuration,animations: {
+            self.imageView.frame = CGRectMake(self.view.center.x, self.view.center.y, 0, 0)
+        })
     }
     
 //MARK:- Scroll View Delegate Methods
-    public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+    internal func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         return self.imageView
     }
     
-    public func scrollViewDidZoom(scrollView: UIScrollView) {
+    internal func scrollViewDidZoom(scrollView: UIScrollView) {
         self.centerScrollViewContents()
     }
     
-    public func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+    internal func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
     }
 
 //MARK:- Gesture Recognizer delegate Methods
-    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+    internal func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         
         if gestureRecognizer == self.flickGestureRecognizer {
             let panGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
@@ -317,7 +304,6 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
     
     func switchingToSize(size: CGSize,xRatio: CGFloat, yRatio: CGFloat) {
         
-        self.backgroundView.frame = CGRectMake(0, 0, size.width, size.height)
         self.scrollView.frame = CGRectMake(0, 0, size.width, size.height)
         
         let imageDimensions = self.getImageDisplayDimensions(self.image)
@@ -376,6 +362,29 @@ public class FPGallerySlideViewController: UIViewController, UIScrollViewDelegat
         }
         self.centerScrollViewContents()
     }
+    
+    
+    func getZoomRectForScale(scale: CGFloat, andCenter center:CGPoint) -> CGRect {
+        
+        var zoomRect: CGRect = CGRect()
+        
+        zoomRect.size.height = self.scrollView.frame.height / scale
+        zoomRect.size.width = self.scrollView.frame.width / scale
+        
+        zoomRect.origin.x = center.x - (zoomRect.size.width / 2)
+        zoomRect.origin.y = center.y - (zoomRect.size.height / 2)
+        
+        return zoomRect
+    }
+    
+    
+//MARK:- Dismissing View Controller
+    func dismiss() {
+        self.animator.removeAllBehaviors()
+        self.imageView.removeGestureRecognizer(self.flickGestureRecognizer)
+        delegate?.didDismissViewController(self)
+    }
+
 
 
 
